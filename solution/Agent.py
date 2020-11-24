@@ -56,6 +56,7 @@ class Agent:
 #            # TODO add acceleration and change speed
 #            total_velocity = 2
 #        self.v[k+1] = self.v[k] + acceleration
+        self.v[k + 1] = self.v[k]
         self.x[k + 1] = self.x[k] + direction * self.v[k] * interval
         if abs(self.x[k + 1][0] - self.end[0]) < self.v[k]:
             self.x[k + 1][0] = self.end[0]
