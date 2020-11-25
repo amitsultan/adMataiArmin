@@ -5,7 +5,7 @@ MAX_SPEED = 1.5  # m/s
 A = 2 * pow(10, 3)
 B = 0.08
 Z = 0.5
-V_0 = 1.5
+V_0 = 1.2
 tao = 0.5
 
 
@@ -35,7 +35,9 @@ class Agent:
         if k in self.x:
             return self.x[k]
         return None
-
+    # todo added by tomer
+    def get_x(self):
+        return self.x
 #    def exit_direction(self, k):
 #        self.e[k] = self.end - self.x[k]
 #        if self.e[k][0] != 0:
@@ -84,8 +86,8 @@ class Agent:
             agent = agents[i]
             if agent.is_escaped():
                 continue
-            if np.allclose(self.x[k + 1], agent.x[k + 1], atol=0.25):
-                print('Collision')
+            if np.allclose(self.x[k + 1], agent.x[k + 1], atol=0.5):
+                # print('Collision')
                 return False
         return True
 

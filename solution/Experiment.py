@@ -49,8 +49,8 @@ class Experiment:
                     agent.step(self.agents, self.k, resolution)
             all_escaped = self.is_all_escaped()
             self.k += 1
-#        if all_escaped:
-#            print('all agents escaped in time\nTime: {}s'.format((self.k - 1) * 0.01))
+            if all_escaped:
+                print('all agents escaped in time\nTime: {}s'.format((self.k - 1) * 0.01))
 
     def is_all_escaped(self):
         escaped = True
@@ -156,26 +156,36 @@ def seif_gimel():
     total = []
     agents = {}
     max_length = 0
-    for i in range(2):
+    for i in range(200):
         ids.append(i)
         exp = Experiment(num_agents=1, room_size=17)
         exp.run()
         agent = list(exp.agents[0].get_points().values())
         agents[i] = agent
         max_length = max(max_length, len(agent))
+
     for id in agents.keys():
         while len(agents[id]) < max_length:
             agents[id].append(np.nan)
     df = pd.DataFrame(data=agents)
+    counter = 0
     for index, row in df.iterrows():
-        values = np.array(list(row.values))
-        size_without_nan = len(~pd.isnull(values))
-        values = values[~pd.isnull(values)]
-        print(values)
-    #print(df)
+        print("index:" +str(index))
+        for i in range(len(row)):
+            for j in range(i+1,len(row)):
+                if np.allclose(row[i], row[j], atol=0.5):
+                    counter+=1
+                    print(counter)
+        # values = np.array(list(row.values))
+        # size_without_nan = len(~pd.isnull(values))
+        # values = values[~pd.isnull(values)]
+        # print(values)
+    print(counter)
 
 
-
+def q_2_seif_a():
+    exp = Experiment(num_agents=100, room_size=17)
+    exp.run()
 
 if __name__ == '__main__':
-    seif_gimel()
+    q_2_seif_a()
