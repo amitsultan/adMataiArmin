@@ -97,6 +97,6 @@ class Experiment:
                     plt.show()
 
 if __name__ == '__main__':
-    exp = Experiment(num_agents=200, room_size=17)
+    exp = Experiment(num_agents=1, room_size=15, agents_positions=[[7.5, 7.5]])
     exp.run()
     exp.plot_agent_v()
