@@ -9,9 +9,10 @@ resolution = 0.01
 
 class Experiment:
 
-    def __init__(self, num_agents, agents_positions=None, room_size=15, endpoint=np.array([2.5, 2.5])):
+    def __init__(self, num_agents, agents_positions=None, room_size=15, endpoint=np.array([17, 17/2])):
         self.agents = np.ndarray(num_agents, dtype=np.object)
         self.k = 0
+        self.endpoint = endpoint
         self.room_size = room_size
         if agents_positions is not None and len(agents_positions) == num_agents:
             for i in range(num_agents):
@@ -96,7 +97,28 @@ class Experiment:
                     plt.title('Acceleration graph')
                     plt.show()
 
+    def plot_agent_movement(self, index=None):
+        if not index:
+            for agent in self.agents:
+                if agent.is_escaped():
+                    points = agent.get_points()
+                    lists = sorted(points.items())
+                    time, cords = zip(*lists)
+                    x, y = zip(*cords)
+                    plt.scatter(x, y)
+                    plt.ylabel('Y')
+                    plt.xlabel('X')
+                    plt.title('Agent path')
+                    plt.scatter(x=self.endpoint[0], y=self.endpoint[1], color='green')
+                    plt.text(self.endpoint[0], self.endpoint[1], 'End\n')
+                    plt.scatter(x=x[0], y=y[0], color='red')
+                    plt.text(x[0], y[0], 'Start\n')
+                    plt.xlim(0, self.room_size - 2)
+                    plt.ylim(0, self.room_size - 2)
+                    plt.show()
+
+
 if __name__ == '__main__':
-    exp = Experiment(num_agents=200, room_size=17)
+    exp = Experiment(num_agents=1, room_size=17, agents_positions=[[7.5, 7.5]])
     exp.run()
     exp.plot_agent_v()

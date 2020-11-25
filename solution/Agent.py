@@ -60,6 +60,7 @@ class Agent:
         if self.e[k][1] != 0:
             direction[1] = self.e[k][1] / abs(self.e[k][1])
         self.x[k + 1] = self.x[k] + direction * self.v[k + 1] * interval
+        self.fix_small_errors(k)
         if self.agents_collision(k, agents):
             destination = np.linalg.norm(self.x[k + 1] - self.end)
             if destination < 0.1:
@@ -71,6 +72,16 @@ class Agent:
             self.x[k + 1] = self.x[k]
             self.v[k + 1] = 0
             self.a[k + 1] = 0
+
+    def fix_small_errors(self, k):
+        min_x = min(self.x[k][0], self.x[k + 1][0])
+        max_x = max(self.x[k][0], self.x[k + 1][0])
+        min_y = min(self.x[k][1], self.x[k + 1][1])
+        max_y = max(self.x[k][1], self.x[k + 1][1])
+        if min_x <= self.end[0] <= max_x:
+            self.x[k + 1][0] = self.end[0]
+        if min_y <= self.end[1] <= max_y:
+            self.x[k + 1][1] = self.end[1]
 
     def agents_collision(self, k, agents):
         for i in range(self.ID):
@@ -89,6 +100,9 @@ class Agent:
 
     def get_acceleration(self):
         return self.a
+
+    def get_points(self):
+        return self.x
 
     def get_start_cords(self):
         return self.x[0]
