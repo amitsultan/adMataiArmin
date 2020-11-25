@@ -1,6 +1,5 @@
 import numpy as np
 import Room as room
-import numpy as np
 
 MAX_SPEED = 1.5  # m/s
 A = 2 * pow(10, 3)
@@ -31,8 +30,6 @@ class Agent:
         self.m = 80
         self.v[0] = 0
         self.escaped = False
-        print('I started at: ({}, {})'.format(self.x[0][0], self.x[0][1]))
-        print('End at: ({}, {})'.format(self.end[0], self.end[1]))
 
     def get_position(self, k):
         if k in self.x:
@@ -67,7 +64,6 @@ class Agent:
                 self.x[k + 1] = self.end
             if np.allclose(self.x[k + 1], self.end):
                 self.escaped = True
-                print('Escaped: {}'.format(self.ID))
         else:
             self.x[k + 1] = self.x[k]
             self.v[k + 1] = 0
@@ -89,6 +85,7 @@ class Agent:
             if agent.is_escaped():
                 continue
             if np.allclose(self.x[k + 1], agent.x[k + 1], atol=0.25):
+                print('Collision')
                 return False
         return True
 
@@ -107,7 +104,8 @@ class Agent:
     def get_start_cords(self):
         return self.x[0]
 
-
+    def get_id(self):
+        return self.ID
 
 if __name__ == '__main__':
     victim1 = Agent(room_size=15, endpoint=np.array([0, 7]))

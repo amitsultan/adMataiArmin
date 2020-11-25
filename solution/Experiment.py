@@ -1,7 +1,7 @@
 import numpy as np
 from Agent import Agent
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 T = 90
 resolution = 0.01
@@ -24,7 +24,6 @@ class Experiment:
                 cords = self.get_unique_cords()
                 agent = Agent(id=i, room_size=room_size, x=cords[0], y=cords[1], endpoint=endpoint)
                 self.agents[i] = agent
-        print('Done __init__ Experiment')
 
     def get_unique_cords(self):
         while True:
@@ -44,14 +43,14 @@ class Experiment:
     def run(self):
         all_escaped = self.is_all_escaped()
         while self.k * resolution < T and not all_escaped:
-            print('Current Time: {}s'.format(self.k * resolution))
+#            print('Current Time: {}s'.format(self.k * resolution))
             for agent in self.agents:
                 if not agent.is_escaped():
-                    agent.step(self.agents, self.k)
+                    agent.step(self.agents, self.k, resolution)
             all_escaped = self.is_all_escaped()
             self.k += 1
-        if all_escaped:
-            print('all agents escaped in time\nTime: {}s'.format((self.k - 1) * 0.01))
+#        if all_escaped:
+#            print('all agents escaped in time\nTime: {}s'.format((self.k - 1) * 0.01))
 
     def is_all_escaped(self):
         escaped = True
@@ -117,8 +116,66 @@ class Experiment:
                     plt.ylim(0, self.room_size - 2)
                     plt.show()
 
+    def agents_escape_times(self):
+        if self.is_all_escaped():
+            times = {}
+            for agent in self.agents:
+                times[agent.get_id()] = round(len(agent.get_points()) * resolution, 2)
+            return times
+        else:
+            return None
+
+
+def seif_b():
+    ids = []
+    total = []
+    for i in range(200):
+        ids.append(i)
+        exp = Experiment(num_agents=1, room_size=17)
+        exp.run()
+        times = exp.agents_escape_times()
+        if times is not None:
+            for id in times.keys():
+                total.append(times[id])
+
+    print('Summary of 200 random agents:')
+    print('mean: ', np.mean(total))
+    print('median: ', np.median(total))
+    print('max: ', np.max(total))
+    print('min: ', np.min(total))
+    print(len(ids))
+    print(len(total))
+    from scipy import stats
+    D, p = stats.kstest(total, "norm")
+    print(D)
+    print(p)
+
+from collections import Counter
+def seif_gimel():
+    ids = []
+    total = []
+    agents = {}
+    max_length = 0
+    for i in range(2):
+        ids.append(i)
+        exp = Experiment(num_agents=1, room_size=17)
+        exp.run()
+        agent = list(exp.agents[0].get_points().values())
+        agents[i] = agent
+        max_length = max(max_length, len(agent))
+    for id in agents.keys():
+        while len(agents[id]) < max_length:
+            agents[id].append(np.nan)
+    df = pd.DataFrame(data=agents)
+    for index, row in df.iterrows():
+        values = np.array(list(row.values))
+        size_without_nan = len(~pd.isnull(values))
+        values = values[~pd.isnull(values)]
+        print(values)
+    #print(df)
+
+
+
 
 if __name__ == '__main__':
-    exp = Experiment(num_agents=1, room_size=17, agents_positions=[[7.5, 7.5]])
-    exp.run()
-    exp.plot_agent_v()
+    seif_gimel()
