@@ -3,26 +3,34 @@ from Agent import Agent
 import matplotlib.pyplot as plt
 import pandas as pd
 
-T = 90
+T = 9011
 resolution = 0.01
 
 
 class Experiment:
 
-    def __init__(self, num_agents, agents_positions=None, room_size=15, endpoint=np.array([17, 17/2])):
+    def __init__(self, num_agents, elder_ratio=0., agents_positions=None, room_size=15, endpoint=np.array([17, 17/2])):
         self.agents = np.ndarray(num_agents, dtype=np.object)
         self.k = 0
         self.endpoint = endpoint
         self.room_size = room_size
+        number_of_elders = round(num_agents * elder_ratio)
+        print('elders: ', number_of_elders)
         if agents_positions is not None and len(agents_positions) == num_agents:
             for i in range(num_agents):
                 position = agents_positions[i]
-                agent = Agent(id=i, room_size=room_size, x=position[0], y=position[1], endpoint=endpoint)
+                if i < number_of_elders:
+                    agent = Agent(id=i, room_size=room_size,type='elderly', x=position[0], y=position[1], endpoint=endpoint)
+                else:
+                    agent = Agent(id=i, room_size=room_size, x=position[0], y=position[1], endpoint=endpoint)
                 self.agents[i] = agent
         else:
             for i in range(num_agents):
                 cords = self.get_unique_cords()
-                agent = Agent(id=i, room_size=room_size, x=cords[0], y=cords[1], endpoint=endpoint)
+                if i < number_of_elders:
+                    agent = Agent(id=i, room_size=room_size, type='elderly', x=cords[0], y=cords[1], endpoint=endpoint)
+                else:
+                    agent = Agent(id=i, room_size=room_size, x=cords[0], y=cords[1], endpoint=endpoint)
                 self.agents[i] = agent
 
     def get_unique_cords(self):
@@ -43,14 +51,21 @@ class Experiment:
     def run(self):
         all_escaped = self.is_all_escaped()
         while self.k * resolution < T and not all_escaped:
-#            print('Current Time: {}s'.format(self.k * resolution))
+            if self.k % 100 == 0:
+                print('Current Time: {}s'.format(self.k * resolution))
             for agent in self.agents:
                 if not agent.is_escaped():
                     agent.step(self.agents, self.k, resolution)
             all_escaped = self.is_all_escaped()
             self.k += 1
-#        if all_escaped:
-#            print('all agents escaped in time\nTime: {}s'.format((self.k - 1) * 0.01))
+        if all_escaped:
+            print('all agents escaped in time\nTime: {}s'.format((self.k - 1) * 0.01))
+        else:
+            index = 0
+            for agent in self.agents:
+                if agent.is_escaped():
+                    index += 1
+            print('escaped: ',index)
 
     def is_all_escaped(self):
         escaped = True
@@ -112,8 +127,8 @@ class Experiment:
                     plt.text(self.endpoint[0], self.endpoint[1], 'End\n')
                     plt.scatter(x=x[0], y=y[0], color='red')
                     plt.text(x[0], y[0], 'Start\n')
-                    plt.xlim(0, self.room_size - 2)
-                    plt.ylim(0, self.room_size - 2)
+                    plt.xlim(0, self.room_size)
+                    plt.ylim(0, self.room_size)
                     plt.show()
 
     def agents_escape_times(self):
@@ -156,26 +171,44 @@ def seif_gimel():
     total = []
     agents = {}
     max_length = 0
-    for i in range(2):
+    counter = 0
+    for i in range(200):
         ids.append(i)
         exp = Experiment(num_agents=1, room_size=17)
         exp.run()
         agent = list(exp.agents[0].get_points().values())
         agents[i] = agent
         max_length = max(max_length, len(agent))
-    for id in agents.keys():
-        while len(agents[id]) < max_length:
-            agents[id].append(np.nan)
-    df = pd.DataFrame(data=agents)
-    for index, row in df.iterrows():
-        values = np.array(list(row.values))
-        size_without_nan = len(~pd.isnull(values))
-        values = values[~pd.isnull(values)]
-        print(values)
-    #print(df)
+    times = []
+    for i in range(max_length):
+        values = []
+        for j in range(len(agents)):
+            if i < len(agents[j]):
+                values.append(agents[j][i])
+        times.append(values)
+    index = 0
+    for time in times:
+        print(len(times) - index)
+        index += 1
+        for i in range(len(time)):
+            x = np.array(time[i])
+            for j in range(len(time)):
+                y = np.array(time[j])
+                if i == j:
+                    continue
+                if np.allclose(x, y, atol=0.5):
+                    counter += 1
+        print('collisions: ', counter)
 
-
+def q_2_seif_a():
+    exp = Experiment(num_agents=200, room_size=17)
+    exp.run()
 
 
 if __name__ == '__main__':
-    seif_gimel()
+    #exp = Experiment(num_agents=1, room_size=17, agents_positions=[[7.5, 7.5]])
+    #exp.run()
+    #exp.plot_agent_movement()
+    #seif_gimel()
+    exp = Experiment(num_agents=200, room_size=17, elder_ratio=0.2)
+    exp.run()
