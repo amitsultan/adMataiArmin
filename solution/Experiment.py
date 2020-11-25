@@ -9,7 +9,7 @@ resolution = 0.01
 
 class Experiment:
 
-    def __init__(self, num_agents, elder_ratio=0., agents_positions=None, room_size=15, endpoint=np.array([17, 17/2])):
+    def __init__(self, num_agents, endpoint, elder_ratio=0., agents_positions=None, room_size=15):
         self.agents = np.ndarray(num_agents, dtype=np.object)
         self.k = 0
         self.endpoint = endpoint
@@ -123,8 +123,9 @@ class Experiment:
                     plt.ylabel('Y')
                     plt.xlabel('X')
                     plt.title('Agent path')
-                    plt.scatter(x=self.endpoint[0], y=self.endpoint[1], color='green')
-                    plt.text(self.endpoint[0], self.endpoint[1], 'End\n')
+                    goal = agent.get_goal()
+                    plt.scatter(x=goal[0], y=goal[1], color='green')
+                    plt.text(goal[0], goal[1], 'End\n')
                     plt.scatter(x=x[0], y=y[0], color='red')
                     plt.text(x[0], y[0], 'Start\n')
                     plt.xlim(0, self.room_size)
@@ -206,9 +207,6 @@ def q_2_seif_a():
 
 
 if __name__ == '__main__':
-    #exp = Experiment(num_agents=1, room_size=17, agents_positions=[[7.5, 7.5]])
-    #exp.run()
-    #exp.plot_agent_movement()
-    #seif_gimel()
-    exp = Experiment(num_agents=200, room_size=17, elder_ratio=0.2)
+    endpoints = [[17, 17/2], [0, 17/2]]
+    exp = Experiment(endpoint=endpoints, num_agents=200, room_size=17)
     exp.run()
