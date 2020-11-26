@@ -26,7 +26,11 @@ class Agent:
             self.multiplier = 1
         elif type == "elderly":
             self.multiplier = 1 / 3
-        self.V_0 = 1.2 * self.multiplier
+        elif type == "random_speed":
+            self.multiplier = 1
+            self.V_0 = np.random.uniform(0.8, 1.5)
+        self.V_0 = self.V_0  * self.multiplier
+        print(self.V_0)
         if x is None or y is None:
             self.x[0] = np.array([np.random.randint(low=1, high=room_size - 1), np.random.randint(low=1, high=room_size - 1)])
         else:
