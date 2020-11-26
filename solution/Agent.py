@@ -26,7 +26,7 @@ class Agent:
             self.multiplier = 1
         elif type == "elderly":
             self.multiplier = 1 / 3
-        self.V_0 = 1.5 * self.multiplier
+        self.V_0 = 1.2 * self.multiplier
         if x is None or y is None:
             self.x[0] = np.array([np.random.randint(low=1, high=room_size - 1), np.random.randint(low=1, high=room_size - 1)])
         else:

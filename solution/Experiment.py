@@ -15,7 +15,7 @@ class Experiment:
         self.endpoint = endpoint
         self.room_size = room_size
         number_of_elders = round(num_agents * elder_ratio)
-        print('elders: ', number_of_elders)
+        #print('elders: ', number_of_elders)
         if agents_positions is not None and len(agents_positions) == num_agents:
             for i in range(num_agents):
                 position = agents_positions[i]
@@ -65,7 +65,7 @@ class Experiment:
             for agent in self.agents:
                 if agent.is_escaped():
                     index += 1
-            print('escaped: ',index)
+            # print('escaped: ',index)
 
     def is_all_escaped(self):
         escaped = True
@@ -210,5 +210,5 @@ if __name__ == '__main__':
     #exp.run()
     #exp.plot_agent_movement()
     #seif_gimel()
-    exp = Experiment(num_agents=200, room_size=17, elder_ratio=0.2)
+    exp = Experiment(num_agents=100, room_size=17, elder_ratio=0.2)
     exp.run()
