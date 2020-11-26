@@ -9,7 +9,7 @@ resolution = 0.01
 
 class Experiment:
 
-    def __init__(self, num_agents, endpoint, see_endpoint_fire = 0., un_aware_agents=0., elder_ratio=0., agents_positions=None, room_size=15):
+    def __init__(self, num_agents, endpoint, see_endpoint_fire = 0., un_aware_agents=0., elder_ratio=0., agents_positions=None, room_size=15, type="normal"):
         self.agents = np.ndarray(num_agents, dtype=np.object)
         self.k = 0
         self.endpoint = endpoint
@@ -31,11 +31,11 @@ class Experiment:
                 if i < number_of_elders:
                     agent = Agent(id=i, room_size=room_size, type='elderly', x=position[0], y=position[1], endpoint=endpoint)
                 elif i < number_of_unaware_agents:
-                    agent = Agent(id=i, room_size=room_size, see_endpoint=False, x=position[0], y=position[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, see_endpoint=False, x=position[0], y=position[1], endpoint=endpoint, type=type)
                 elif i < endpoint_fire_agents:
-                    agent = Agent(id=i, room_size=room_size, fire_alerted=True, x=position[0], y=position[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, fire_alerted=True, x=position[0], y=position[1], endpoint=endpoint, type=type)
                 else:
-                    agent = Agent(id=i, room_size=room_size, x=position[0], y=position[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, x=position[0], y=position[1], endpoint=endpoint, type=type)
                 self.agents[i] = agent
         else:
             for i in range(num_agents):
@@ -43,11 +43,11 @@ class Experiment:
                 if i < number_of_elders:
                     agent = Agent(id=i, room_size=room_size, type='elderly', x=cords[0], y=cords[1], endpoint=endpoint)
                 elif i < number_of_unaware_agents:
-                    agent = Agent(id=i, room_size=room_size, see_endpoint=False, x=cords[0], y=cords[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, see_endpoint=False, x=cords[0], y=cords[1], endpoint=endpoint, type=type)
                 elif i < endpoint_fire_agents:
-                    agent = Agent(id=i, room_size=room_size, fire_alerted=True, x=cords[0], y=cords[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, fire_alerted=True, x=cords[0], y=cords[1], endpoint=endpoint, type=type)
                 else:
-                    agent = Agent(id=i, room_size=room_size, x=cords[0], y=cords[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, x=cords[0], y=cords[1], endpoint=endpoint, type=type)
                 self.agents[i] = agent
 
 
@@ -221,11 +221,14 @@ def seif_gimel():
         print('collisions: ', counter)
 
 def q_2_seif_a():
-    exp = Experiment(num_agents=200, room_size=17)
+    exp = Experiment(endpoint=[[17, 17/2]],num_agents=20, room_size=17, type="random_speed")
     exp.run()
 
 
 if __name__ == '__main__':
+    q_2_seif_a()
+    '''
     endpoints = [[17, 17/2]]
     exp = Experiment(endpoint=endpoints, see_endpoint_fire=0.5, num_agents=100, room_size=17)
     exp.run()
+    '''
