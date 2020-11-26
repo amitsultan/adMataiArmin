@@ -6,13 +6,13 @@ A = 2 * pow(10, 3)
 B = 0.08
 Z = 0.5
 tao = 0.5
-
 global_collisions = 0
+
 
 class Agent:
 
     # endpoint is the door position (x, y)
-    def __init__(self, id, room_size, endpoint, type="normal", x=None, y=None, see_endpoint=True):
+    def __init__(self, id, room_size, endpoint, type="normal", x=None, y=None, see_endpoint=True, fire_alerted=False):
         self.ID = id
         # each array index is (k = index)
         # x[0] = (x, y)
@@ -46,6 +46,7 @@ class Agent:
         self.m = 80
         self.v[0] = 0
         self.escaped = False
+        self.fire_alerted = fire_alerted
 
     def get_position(self, k):
         if k in self.x:
@@ -62,7 +63,10 @@ class Agent:
     def step(self, agents, k, interval=0.01):
         if self.escaped:
             return True
-        self.e[k] = self.end - self.x[k]
+        if not self.fire_alerted:
+            self.e[k] = self.end - self.x[k]
+        else:
+            self.get_direction_from_agents(agents, k)
         if np.linalg.norm(self.v[k]) < MAX_SPEED:
             self.a[k] = (self.V_0 - self.v[k]) / tao
             self.v[k + 1] = (self.v[k] + interval * self.a[k])
@@ -89,6 +93,23 @@ class Agent:
             self.x[k + 1] = self.x[k]
             self.v[k + 1] = 0
             self.a[k + 1] = 0
+
+    def get_direction_from_agents(self, agents, k):
+        if np.linalg.norm(self.x[k] - self.end) <= 5:
+            self.e[k] = self.end - self.x[k]
+            return
+        x_avg = []
+        y_avg = []
+        for agent in agents:
+            if not agent.is_escaped() and np.linalg.norm(agent.x[k] - self.x[k]) <= 5:
+                distance = agent.x[k] - self.x[k]
+                x_avg.append(distance[0])
+                y_avg.append(distance[1])
+        if len(x_avg) == 0 and k >= 1:
+            self.e[k] = self.e[k - 1]
+        else:
+            self.e[k] = np.array([np.mean(x_avg), np.mean(y_avg)])
+        return
 
     def fix_small_errors(self, k):
         min_x = min(self.x[k][0], self.x[k + 1][0])
