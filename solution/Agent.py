@@ -12,7 +12,7 @@ global_collisions = 0
 class Agent:
 
     # endpoint is the door position (x, y)
-    def __init__(self, id, room_size, endpoint, type="normal", x=None, y=None):
+    def __init__(self, id, room_size, endpoint, type="normal", x=None, y=None, see_endpoint=True):
         self.ID = id
         # each array index is (k = index)
         # x[0] = (x, y)
@@ -31,7 +31,14 @@ class Agent:
             self.x[0] = np.array([np.random.randint(low=1, high=room_size - 1), np.random.randint(low=1, high=room_size - 1)])
         else:
             self.x[0] = np.array([x, y])
-        self.end = endpoint
+        if see_endpoint:
+            closest_endpoint = float("inf")
+            for end in endpoint:
+                if np.linalg.norm(np.array(self.x[0] - end)) < np.linalg.norm(np.array(self.x[0] - closest_endpoint)):
+                    closest_endpoint = end
+            self.end = np.array(closest_endpoint)
+        else:
+            self.end = np.array(endpoint[0])
         self.m = 80
         self.v[0] = 0
         self.escaped = False
@@ -102,6 +109,9 @@ class Agent:
 
     def is_escaped(self):
         return self.escaped
+
+    def get_goal(self):
+        return self.end
 
     def get_velocity(self):
         return self.v
