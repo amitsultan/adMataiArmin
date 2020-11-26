@@ -3,24 +3,37 @@ from Agent import Agent
 import matplotlib.pyplot as plt
 import pandas as pd
 
-T = 9011
+T = 90
 resolution = 0.01
 
 
 class Experiment:
 
-    def __init__(self, num_agents, endpoint, elder_ratio=0., agents_positions=None, room_size=15):
+    def __init__(self, num_agents, endpoint, see_endpoint_fire = 0., un_aware_agents=0., elder_ratio=0., agents_positions=None, room_size=15):
         self.agents = np.ndarray(num_agents, dtype=np.object)
         self.k = 0
         self.endpoint = endpoint
         self.room_size = room_size
         number_of_elders = round(num_agents * elder_ratio)
+        number_of_unaware_agents = round(num_agents * un_aware_agents)
+        endpoint_fire_agents = round(num_agents * see_endpoint_fire)
+        if number_of_unaware_agents > 0 and number_of_elders > 0:
+            number_of_elders = 0
+        if endpoint_fire_agents > 0:
+            number_of_elders = 0
+            number_of_unaware_agents = 0
         print('elders: ', number_of_elders)
+        print('unaware: ',number_of_unaware_agents)
+        print('fire alerted: ',endpoint_fire_agents)
         if agents_positions is not None and len(agents_positions) == num_agents:
             for i in range(num_agents):
                 position = agents_positions[i]
                 if i < number_of_elders:
-                    agent = Agent(id=i, room_size=room_size,type='elderly', x=position[0], y=position[1], endpoint=endpoint)
+                    agent = Agent(id=i, room_size=room_size, type='elderly', x=position[0], y=position[1], endpoint=endpoint)
+                elif i < number_of_unaware_agents:
+                    agent = Agent(id=i, room_size=room_size, see_endpoint=False, x=position[0], y=position[1], endpoint=endpoint)
+                elif i < endpoint_fire_agents:
+                    agent = Agent(id=i, room_size=room_size, fire_alerted=True, x=position[0], y=position[1], endpoint=endpoint)
                 else:
                     agent = Agent(id=i, room_size=room_size, x=position[0], y=position[1], endpoint=endpoint)
                 self.agents[i] = agent
@@ -29,9 +42,15 @@ class Experiment:
                 cords = self.get_unique_cords()
                 if i < number_of_elders:
                     agent = Agent(id=i, room_size=room_size, type='elderly', x=cords[0], y=cords[1], endpoint=endpoint)
+                elif i < number_of_unaware_agents:
+                    agent = Agent(id=i, room_size=room_size, see_endpoint=False, x=cords[0], y=cords[1], endpoint=endpoint)
+                elif i < endpoint_fire_agents:
+                    agent = Agent(id=i, room_size=room_size, fire_alerted=True, x=cords[0], y=cords[1], endpoint=endpoint)
                 else:
                     agent = Agent(id=i, room_size=room_size, x=cords[0], y=cords[1], endpoint=endpoint)
                 self.agents[i] = agent
+
+
 
     def get_unique_cords(self):
         while True:
@@ -207,6 +226,6 @@ def q_2_seif_a():
 
 
 if __name__ == '__main__':
-    endpoints = [[17, 17/2], [0, 17/2]]
-    exp = Experiment(endpoint=endpoints, num_agents=200, room_size=17)
+    endpoints = [[17, 17/2]]
+    exp = Experiment(endpoint=endpoints, see_endpoint_fire=0.5, num_agents=100, room_size=17)
     exp.run()

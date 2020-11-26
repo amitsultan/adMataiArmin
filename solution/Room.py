@@ -60,5 +60,5 @@ class Room:
 
 
 if __name__ == '__main__':
-    room = Room(room_size=15)
-
+    x = [1, 2]
+    print(np.mean(x))
